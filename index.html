@@ -43,6 +43,20 @@
     .grid{grid-template-columns:repeat(2,160px)}
     .options{grid-template-columns:repeat(2,1fr)}
   }
+  .topbar img {
+  transition: transform 0.3s ease;
+}
+.topbar img:hover {
+  transform: scale(1.05);
+}
+
+@media (max-width: 600px) {
+  .topbar img {
+    width: 48px;
+    border-radius: 10px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -50,7 +64,7 @@
 <!-- Topbar / logo -->
 <div class="topbar">
   <div style="pointer-events:auto;">
-    <img src="LOGO.png" alt="" style="width:48px;height:48px;border-radius:8px;display:inline-block;margin-right:10px;vertical-align:middle;background:linear-gradient(90deg,var(--purple-1),var(--purple-2));"/>
+    <img src="LOGO.png" alt="" style="width:64px;height:auto;border-radius:12px;display:inline-block;margin-right:10px;vertical-align:middle;box-shadow:0 0 12px rgba(79,70,229,0.4);"/>
   </div>
 </div>
 
@@ -533,4 +547,5 @@ hide(resultsScreen);
 </script>
 </body>
 </html>
+
 
