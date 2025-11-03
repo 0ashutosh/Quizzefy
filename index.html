@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>AbacusSeekho — Math Master Challenge</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0c1a;
+    --card:#0f1724;
+    --muted:#9aa3b2;
+    --white:#ffffff;
+    --purple-1:#4f46e5;
+    --purple-2:#6366f1;
+  }
+  html,body{height:100%;margin:0;background:var(--bg);font-family:"Poppins",system-ui,Arial;color:var(--white)}
+  .centered{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px;box-sizing:border-box}
+  .title{font-size:28px;font-weight:700;margin-bottom:6px}
+  .subtitle{color:rgba(255,255,255,0.7);margin-bottom:18px}
+  .grid{display:grid;grid-template-columns:repeat(3,220px);gap:18px;justify-content:center}
+  .lvl-btn{background:linear-gradient(90deg,var(--purple-1),var(--purple-2));color:white;padding:18px;border-radius:12px;border:none;font-weight:700;cursor:pointer;box-shadow:0 8px 20px rgba(79,70,229,0.15);transition:transform .12s,box-shadow .12s}
+  .lvl-btn:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(79,70,229,0.22)}
+  .card{background:rgba(255,255,255,0.02);padding:26px;border-radius:14px;box-shadow:0 10px 30px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.03);width:100%;max-width:920px}
+  .start-btn{background:linear-gradient(90deg,var(--purple-1),var(--purple-2));color:white;padding:14px 20px;border-radius:10px;border:none;font-weight:700;width:100%;cursor:pointer}
+  .question-large{font-size:48px;font-weight:700;margin:28px 0;text-align:center}
+  .options{display:grid;grid-template-columns:repeat(2,160px);gap:18px;justify-content:center}
+  .opt{background:linear-gradient(90deg,var(--purple-1),var(--purple-2));color:white;padding:14px;border-radius:12px;border:none;font-weight:700;cursor:pointer;box-shadow:0 8px 20px rgba(79,70,229,0.12);transition:transform .12s}
+  .opt:active{transform:scale(.98)}
+  .muted{color:var(--muted)}
+  .timer{font-size:28px;font-weight:700;margin-top:16px}
+  .timer.urgent{color:#ff7b7b;animation: pulse 1s infinite}
+  @keyframes pulse{0%{opacity:1}50%{opacity:.5}100%{opacity:1}}
+  table{width:100%;border-collapse:collapse;color:var(--muted);font-size:14px}
+  th,td{padding:8px;border-bottom:1px solid rgba(255,255,255,0.03);text-align:left}
+  .correct{color:#86efac;font-weight:700}
+  .wrong{color:#fb7185;font-weight:700}
+  .small{font-size:13px;color:var(--muted)}
+  .topbar{position:fixed;left:0;right:0;top:0;height:68px;display:flex;align-items:center;padding:0 28px;background:transparent;pointer-events:none}
+  .logo{pointer-events:auto}
+  .hidden{display:none}
+  @media (max-width:800px){
+    .grid{grid-template-columns:repeat(2,160px)}
+    .options{grid-template-columns:repeat(2,1fr)}
+  }
+</style>
+</head>
+<body>
+
+<!-- Topbar / logo -->
+<div class="topbar">
+  <div style="pointer-events:auto;">
+    <img src="" alt="" style="width:48px;height:48px;border-radius:8px;display:inline-block;margin-right:10px;vertical-align:middle;background:linear-gradient(90deg,var(--purple-1),var(--purple-2));"/>
+  </div>
+</div>
+
+<!-- Home / Level select -->
+<main id="home" class="centered">
+  <div class="card" style="text-align:center;max-width:900px">
+    <div style="padding:10px 0">
+      <div style="font-weight:700;font-size:22px">AbacusSeekho.com®</div>
+      <div style="color:var(--muted);margin-top:6px">Brain Development Academy • An ISO 9001:2015 Certified Institute</div>
+      <h1 class="title" style="margin-top:18px">Math Master Challenge</h1>
+      <div class="subtitle">Test your math skills with our adaptive difficulty quiz system. Choose your level to begin!</div>
+    </div>
+
+    <div style="margin-top:12px">
+      <div class="grid" id="levelGrid"></div>
+    </div>
+  </div>
+</main>
+
+<!-- Level start -->
+<section id="levelStart" class="centered hidden">
+  <div class="card" style="max-width:600px;text-align:center">
+    <div style="font-weight:700;font-size:20px" id="startTitle">Level 0</div>
+    <div class="muted" style="margin-top:8px">You'll have <strong>6 seconds</strong> per question.<br/>There are <strong>100 questions</strong> in total.</div>
+    <div style="margin-top:20px">
+      <button class="start-btn" id="startQuizBtn">Start Quiz</button>
+    </div>
+    <div style="margin-top:12px"><button class="lvl-btn" id="backToHome" style="background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)">Back</button></div>
+  </div>
+</section>
+
+<!-- Quiz screen -->
+<section id="quizScreen" class="centered hidden">
+  <div style="width:100%;max-width:920px;padding:20px;box-sizing:border-box">
+    <div style="text-align:center;margin-bottom:6px" class="muted">Level <span id="displayLevel">0</span></div>
+    <div style="text-align:center;margin-bottom:10px">
+      <div style="font-size:18px;font-weight:600">Question <span id="questionNumber">1</span> of 100</div>
+      <div class="small muted">Total Time: <span id="totalTimeDisplay">0:00</span></div>
+    </div>
+
+    <div class="card" style="text-align:center;margin-top:10px">
+      <div class="question-large" id="questionText">7 + 1</div>
+
+      <div class="options" id="optionsContainer">
+        <!-- buttons go here -->
+      </div>
+
+      <div class="timer" id="countdown">6</div>
+    </div>
+  </div>
+</section>
+
+<!-- Results -->
+<section id="resultsScreen" class="centered hidden">
+  <div class="card" style="max-width:760px">
+    <h2 style="margin-top:0">Quiz Complete!</h2>
+    <div style="display:flex;gap:18px;align-items:center">
+      <div style="flex:1;background:rgba(255,255,255,0.02);padding:14px;border-radius:12px">
+        <div class="small muted">Level <span id="resultLevel">0</span></div>
+        <div style="font-size:28px;color:var(--purple-1);font-weight:700;margin-top:8px" id="resultScore">0/100 Correct</div>
+        <div class="small muted" id="resultPercent">0%</div>
+        <div class="small muted" id="resultTime" style="margin-top:8px">Time: 0:00</div>
+      </div>
+    </div>
+
+    <div style="margin-top:18px">
+      <button class="start-btn" id="retryBtn">Retry Level</button>
+    </div>
+    <div style="margin-top:12px;text-align:center">
+      <button class="lvl-btn" id="chooseLevelBtn" style="background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)">Choose Different Level</button>
+    </div>
+
+    <div style="margin-top:18px">
+      <h3 style="margin-bottom:8px">Detailed results</h3>
+      <div style="max-height:360px;overflow:auto;border-radius:8px;padding:8px;background:rgba(255,255,255,0.01)">
+        <table id="resultsTable">
+          <thead><tr><th>#</th><th>Question</th><th>Your answer</th><th>Correct</th><th>Status</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<script>
+/*
+  Single-file quiz
+  - Copy this file and open in browser.
+  - All logic here uses simple functions and timers.
+*/
+
+// ---------- State ----------
+let currentLevel = 0;
+let currentQuestionIndex = 0; // 0-based index up to 99
+let questions = []; // will hold question objects
+let userAnswers = []; // { chosen, correct, questionText, num1, num2, op }
+let perQuestionTimer = null;
+let totalTimer = null;
+let totalSeconds = 0; // total elapsed in seconds
+const MAX_SECONDS = 600; // 10 minutes
+
+// UI refs
+const homeEl = document.getElementById('home');
+const levelGrid = document.getElementById('levelGrid');
+const levelStartEl = document.getElementById('levelStart');
+const startTitle = document.getElementById('startTitle');
+const startQuizBtn = document.getElementById('startQuizBtn');
+const backToHome = document.getElementById('backToHome');
+
+const quizScreen = document.getElementById('quizScreen');
+const displayLevel = document.getElementById('displayLevel');
+const questionNumberEl = document.getElementById('questionNumber');
+const totalTimeDisplay = document.getElementById('totalTimeDisplay');
+const questionText = document.getElementById('questionText');
+const optionsContainer = document.getElementById('optionsContainer');
+const countdownEl = document.getElementById('countdown');
+
+const resultsScreen = document.getElementById('resultsScreen');
+const resultLevel = document.getElementById('resultLevel');
+const resultScore = document.getElementById('resultScore');
+const resultPercent = document.getElementById('resultPercent');
+const resultTime = document.getElementById('resultTime');
+const resultsTableBody = document.querySelector('#resultsTable tbody');
+const retryBtn = document.getElementById('retryBtn');
+const chooseLevelBtn = document.getElementById('chooseLevelBtn');
+
+// ---------- Helpers ----------
+function show(el){ el.classList.remove('hidden'); }
+function hide(el){ el.classList.add('hidden'); }
+function formatTimeSec(sec){
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return m + ':' + String(s).padStart(2,'0');
+}
+function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+
+// Options generator (keeps values near correct)
+function generateOptions(correct, min, max){
+  const set = new Set([correct]);
+  const range = Math.max(6, Math.floor((max-min+1)/4));
+  while(set.size < 4){
+    const wrong = correct + randInt(-range, range);
+    if(wrong !== correct && wrong >= min && wrong <= max){
+      set.add(wrong);
+    }
+  }
+  const arr = Array.from(set);
+  // shuffle
+  for(let i=arr.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]] = [arr[j],arr[i]];
+  }
+  return arr;
+}
+
+// Generate one question based on level (returns {num1,num2,op,answer,options,text})
+function generateQuestionForLevel(level){
+  let num1=1, num2=1, op='+', answer=2;
+
+  // Level mapping per spec:
+  // 0 & 1: single-digit add/sub
+  // 2: double-digit add/sub
+  // 3: triple-digit add/sub
+  // 4: single & double add/sub/mul
+  // 5: add/sub/mul single & double (harder)
+  // 6: add/sub/mul/div single numbers (division uses floor)
+  // 7: add/sub/mul/div double numbers (division uses floor)
+  // 8: any (up to 4 digits for add/sub/mul; div uses floor)
+  const opsFor = (lvl) => {
+    if(lvl <= 1) return ['+','-'];
+    if(lvl === 2) return ['+','-'];
+    if(lvl === 3) return ['+','-'];
+    if(lvl === 4) return ['+','-','×'];
+    if(lvl === 5) return ['+','-','×'];
+    if(lvl === 6) return ['+','-','×','÷'];
+    if(lvl === 7) return ['+','-','×','÷'];
+    return ['+','-','×','÷'];
+  };
+
+  const ops = opsFor(level);
+  op = ops[Math.floor(Math.random()*ops.length)];
+
+  // choose ranges based on level and operation (ensure scaling & no tiny numbers at high levels)
+  if(level <= 1){
+    // single-digit
+    num1 = randInt(1,9);
+    num2 = randInt(1,9);
+    if(op === '+') answer = num1 + num2;
+    else { if(num2>num1) [num1,num2] = [num2,num1]; answer = num1 - num2; }
+  } else if(level === 2){
+    num1 = randInt(10,99);
+    num2 = randInt(10,99);
+    if(op === '+') answer = num1 + num2;
+    else { if(num2>num1) [num1,num2] = [num2,num1]; answer = num1 - num2; }
+  } else if(level === 3){
+    num1 = randInt(100,999);
+    num2 = randInt(100,999);
+    if(op === '+') answer = num1 + num2;
+    else { if(num2>num1) [num1,num2] = [num2,num1]; answer = num1 - num2; }
+  } else if(level === 4){
+    if(op === '×'){
+      // multiplication more challenging than single digits
+      num1 = randInt(10,50);
+      num2 = randInt(5,20);
+      answer = num1 * num2;
+    } else {
+      num1 = randInt(10,99);
+      num2 = randInt(10,99);
+      if(op === '+') answer = num1 + num2;
+      else { if(num2>num1) [num1,num2] = [num2,num1]; answer = num1 - num2; }
+    }
+  } else if(level === 5){
+    if(op === '×'){
+      num1 = randInt(20,80);
+      num2 = randInt(10,30);
+      answer = num1 * num2;
+    } else {
+      // addition/subtraction larger
+      num1 = randInt(50,200);
+      num2 = randInt(10,150);
+      if(op === '+') answer = num1 + num2;
+      else { if(num2>num1) [num1,num2] = [num2,num1]; answer = num1 - num2; }
+    }
+  } else if(level === 6){
+    if(op === '÷'){
+      num2 = randInt(2,9);
+      num1 = randInt(num2, num2*9);
+      answer = Math.floor(num1/num2);
+    } else if(op === '×'){
+      num1 = randInt(5,20);
+      num2 = randInt(5,20);
+      answer = num1 * num2;
+    } else {
+      num1 = randInt(10,99);
+      num2 = randInt(10,99);
+      if(op === '+') answer = num1 + num2;
+      else { if(num2>num1) [num1,num2] = [num2,num1]; answer = num1 - num2; }
+    }
+  } else if(level === 7){
+    if(op === '÷'){
+      num2 = randInt(10,99);
+      num1 = randInt(num2, num2*9);
+      answer = Math.floor(num1/num2);
+    } else if(op === '×'){
+      num1 = randInt(20,99);
+      num2 = randInt(10,50);
+      answer = num1 * num2;
+    } else {
+      num1 = randInt(100,999);
+      num2 = randInt(50,500);
+      if(op === '+') answer = num1 + num2;
+      else { if(num2>num1) [num1,num2] = [num2,num1]; answer = num1 - num2; }
+    }
+  } else { // level 8
+    if(op === '÷'){
+      num2 = randInt(10,99);
+      num1 = randInt(num2, num2*20);
+      answer = Math.floor(num1/num2);
+    } else if(op === '×'){
+      num1 = randInt(50,999);
+      num2 = randInt(20,200);
+      answer = num1 * num2;
+    } else {
+      num1 = randInt(500,5000);
+      num2 = randInt(100,2000);
+      if(op === '+') answer = num1 + num2;
+      else { if(num2>num1) [num1,num2] = [num2,num1]; answer = num1 - num2; }
+    }
+  }
+
+  const text = `${num1} ${op} ${num2}`;
+  // compute option bounds
+  let optMin = Math.max(0, answer - 10);
+  let optMax = answer + 10;
+  if(op === '×' || op === '÷'){
+    optMin = Math.max(0, answer - Math.max(num1,num2));
+    optMax = answer + Math.max(num1,num2);
+  }
+  const options = generateOptions(answer, optMin, optMax);
+
+  return { num1, num2, op, answer, options, text };
+}
+
+// Pre-generate 100 questions for a level
+function prepareQuestionsForLevel(level){
+  const arr = [];
+  for(let i=0;i<100;i++){
+    arr.push(generateQuestionForLevel(level));
+  }
+  return arr;
+}
+
+// ---------- UI wiring ----------
+function createLevelButtons(){
+  levelGrid.innerHTML = '';
+  for(let i=0;i<=8;i++){
+    const btn = document.createElement('button');
+    btn.className = 'lvl-btn';
+    btn.textContent = `Level ${i}`;
+    btn.onclick = () => {
+      currentLevel = i;
+      startTitle.textContent = `Level ${i}`;
+      show(levelStartEl);
+      hide(homeEl);
+    };
+    levelGrid.appendChild(btn);
+  }
+}
+
+// Start quiz pressed from start screen
+startQuizBtn.addEventListener('click', () => {
+  hide(levelStartEl);
+  startQuiz(currentLevel);
+});
+
+backToHome.addEventListener('click', () => {
+  hide(levelStartEl);
+  show(homeEl);
+});
+
+// Retry and choose
+retryBtn.addEventListener('click', () => {
+  // restart same level
+  startQuiz(currentLevel);
+  hide(resultsScreen);
+});
+
+chooseLevelBtn.addEventListener('click', () => {
+  hide(resultsScreen);
+  show(homeEl);
+});
+
+// Start quiz flow
+function startQuiz(level){
+  // reset state
+  currentQuestionIndex = 0;
+  questions = prepareQuestionsForLevel(level);
+  userAnswers = Array(100).fill(null);
+  totalSeconds = 0;
+  // show quiz screen
+  displayLevel.textContent = level;
+  show(quizScreen);
+  hide(resultsScreen);
+  hide(homeEl);
+  hide(levelStartEl);
+  // start total timer
+  if(totalTimer) { clearInterval(totalTimer); totalTimer = null; }
+  totalTimer = setInterval(()=>{
+    totalSeconds++;
+    totalTimeDisplay.textContent = formatTimeSec(totalSeconds);
+    if(totalSeconds >= MAX_SECONDS){
+      // time over: end quiz
+      endQuiz();
+    }
+  },1000);
+  // show first question
+  renderQuestionAt(currentQuestionIndex);
+  startPerQuestionTimer();
+}
+
+// Render a question
+function renderQuestionAt(idx){
+  const q = questions[idx];
+  questionNumberEl.textContent = String(idx+1);
+  questionText.textContent = q.text;
+  optionsContainer.innerHTML = '';
+  q.options.forEach(opt=>{
+    const b = document.createElement('button');
+    b.className = 'opt';
+    b.textContent = opt;
+    b.onclick = () => {
+      // stop per-question timer and record
+      stopPerQuestionTimer();
+      userAnswers[idx] = { chosen: opt, correct: q.answer, questionText: q.text, idx, op:q.op, num1:q.num1, num2:q.num2 };
+      // advance
+      nextQuestion();
+    };
+    optionsContainer.appendChild(b);
+  });
+  // set countdown UI
+  countdownEl.textContent = '6';
+}
+
+// Start per-question timer
+function startPerQuestionTimer(){
+  stopPerQuestionTimer();
+  let left = 6;
+  countdownEl.textContent = String(left);
+  perQuestionTimer = setInterval(()=>{
+    left--;
+    countdownEl.textContent = String(left);
+    if(left <= 2){
+      countdownEl.classList.add('urgent');
+    } else {
+      countdownEl.classList.remove('urgent');
+    }
+    if(left <= 0){
+      stopPerQuestionTimer();
+      // record null or mark as timed out (chosen null)
+      if(!userAnswers[currentQuestionIndex]){
+        const q = questions[currentQuestionIndex];
+        userAnswers[currentQuestionIndex] = { chosen: null, correct: q.answer, questionText: q.text, idx: currentQuestionIndex, op:q.op, num1:q.num1, num2:q.num2 };
+      }
+      // proceed
+      nextQuestion();
+    }
+  },1000);
+}
+
+function stopPerQuestionTimer(){
+  if(perQuestionTimer){
+    clearInterval(perQuestionTimer);
+    perQuestionTimer = null;
+  }
+}
+
+// Move to next question or end
+function nextQuestion(){
+  currentQuestionIndex++;
+  if(currentQuestionIndex >= 100){
+    endQuiz();
+    return;
+  }
+  // if total time exceeded MAX, end
+  if(totalSeconds >= MAX_SECONDS){
+    endQuiz();
+    return;
+  }
+  renderQuestionAt(currentQuestionIndex);
+  startPerQuestionTimer();
+}
+
+// End quiz and show results
+function endQuiz(){
+  // stop timers
+  stopPerQuestionTimer();
+  if(totalTimer){ clearInterval(totalTimer); totalTimer = null; }
+
+  // compute results
+  const answered = userAnswers.slice(0,100);
+  let correctCount = 0;
+  const wrongList = [];
+  answered.forEach((a,i)=>{
+    if(!a) return;
+    if(a.chosen === a.correct) correctCount++;
+    else wrongList.push({i:a.idx, q:a.questionText, chosen:a.chosen, correct:a.correct});
+  });
+
+  // show results
+  resultLevel.textContent = String(currentLevel);
+  resultScore.textContent = `${correctCount}/100 Correct`;
+  resultPercent.textContent = `${((correctCount/100)*100).toFixed(1)}%`;
+  resultTime.textContent = `Time: ${formatTimeSec(totalSeconds)}`;
+
+  // fill table
+  resultsTableBody.innerHTML = '';
+  for(let i=0;i<100;i++){
+    const a = userAnswers[i] || { chosen: null, correct: questions[i] ? questions[i].answer : null, questionText: questions[i] ? questions[i].text : '' };
+    const tr = document.createElement('tr');
+    const tdIndex = document.createElement('td'); tdIndex.textContent = String(i+1);
+    const tdQ = document.createElement('td'); tdQ.textContent = a.questionText || '';
+    const tdChosen = document.createElement('td'); tdChosen.textContent = (a.chosen === null ? '—' : String(a.chosen));
+    const tdCorrect = document.createElement('td'); tdCorrect.textContent = String(a.correct);
+    const tdStatus = document.createElement('td'); tdStatus.textContent = (a.chosen === a.correct ? 'Correct' : 'Wrong'); tdStatus.className = (a.chosen === a.correct ? 'correct' : 'wrong');
+    tr.appendChild(tdIndex); tr.appendChild(tdQ); tr.appendChild(tdChosen); tr.appendChild(tdCorrect); tr.appendChild(tdStatus);
+    resultsTableBody.appendChild(tr);
+  }
+
+  hide(quizScreen);
+  show(resultsScreen);
+}
+
+// small init
+createLevelButtons();
+show(homeEl);
+hide(levelStartEl);
+hide(quizScreen);
+hide(resultsScreen);
+</script>
+</body>
+</html>
