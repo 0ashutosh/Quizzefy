@@ -14,156 +14,34 @@
     --purple-1:#4f46e5;
     --purple-2:#6366f1;
   }
-
-  html,body{
-    height:100%;
-    margin:0;
-    background:var(--bg);
-    font-family:"Poppins",system-ui,Arial;
-    color:var(--white);
-  }
-
-  .centered{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    min-height:100vh;
-    padding:24px;
-    box-sizing:border-box;
-  }
-
+  html,body{height:100%;margin:0;background:var(--bg);font-family:"Poppins",system-ui,Arial;color:var(--white)}
+  .centered{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px;box-sizing:border-box}
   .title{font-size:28px;font-weight:700;margin-bottom:6px}
   .subtitle{color:rgba(255,255,255,0.7);margin-bottom:18px}
-
-  .grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
-    gap:18px;
-    justify-content:center;
-    width:100%;
-    max-width:700px;
-  }
-
-  .lvl-btn{
-    background:linear-gradient(90deg,var(--purple-1),var(--purple-2));
-    color:white;
-    padding:16px;
-    border-radius:12px;
-    border:none;
-    font-weight:700;
-    cursor:pointer;
-    box-shadow:0 8px 20px rgba(79,70,229,0.15);
-    transition:transform .12s,box-shadow .12s;
-    width:100%;
-  }
+  .grid{display:grid;grid-template-columns:repeat(3,220px);gap:18px;justify-content:center}
+  .lvl-btn{background:linear-gradient(90deg,var(--purple-1),var(--purple-2));color:white;padding:18px;border-radius:12px;border:none;font-weight:700;cursor:pointer;box-shadow:0 8px 20px rgba(79,70,229,0.15);transition:transform .12s,box-shadow .12s}
   .lvl-btn:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(79,70,229,0.22)}
-
-  .card{
-    background:rgba(255,255,255,0.02);
-    padding:26px;
-    border-radius:14px;
-    box-shadow:0 10px 30px rgba(2,6,23,0.6);
-    border:1px solid rgba(255,255,255,0.03);
-    width:100%;
-    max-width:920px;
-  }
-
-  .start-btn{
-    background:linear-gradient(90deg,var(--purple-1),var(--purple-2));
-    color:white;
-    padding:14px 20px;
-    border-radius:10px;
-    border:none;
-    font-weight:700;
-    width:100%;
-    cursor:pointer;
-  }
-
-  .question-large{
-    font-size:48px;
-    font-weight:700;
-    margin:28px 0;
-    text-align:center;
-  }
-
-  /* Remove outer box for quiz */
-  #quizScreen .card {
-    background:transparent;
-    box-shadow:none;
-    border:none;
-    padding:0;
-  }
-
-  .options{
-    display:grid;
-    grid-template-columns:repeat(2, minmax(120px,1fr));
-    gap:18px;
-    justify-content:center;
-    width:100%;
-    max-width:480px;
-    margin:0 auto;
-  }
-
-  .opt{
-    background:linear-gradient(90deg,var(--purple-1),var(--purple-2));
-    color:white;
-    padding:14px;
-    border-radius:12px;
-    border:none;
-    font-weight:700;
-    cursor:pointer;
-    box-shadow:0 8px 20px rgba(79,70,229,0.12);
-    transition:transform .12s;
-    width:100%;
-  }
-  .opt:active{transform:scale(.97)}
-
+  .card{background:rgba(255,255,255,0.02);padding:26px;border-radius:14px;box-shadow:0 10px 30px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.03);width:100%;max-width:920px}
+  .start-btn{background:linear-gradient(90deg,var(--purple-1),var(--purple-2));color:white;padding:14px 20px;border-radius:10px;border:none;font-weight:700;width:100%;cursor:pointer}
+  .question-large{font-size:48px;font-weight:700;margin:28px 0;text-align:center}
+  .options{display:grid;grid-template-columns:repeat(2,160px);gap:18px;justify-content:center}
+  .opt{background:linear-gradient(90deg,var(--purple-1),var(--purple-2));color:white;padding:14px;border-radius:12px;border:none;font-weight:700;cursor:pointer;box-shadow:0 8px 20px rgba(79,70,229,0.12);transition:transform .12s}
+  .opt:active{transform:scale(.98)}
   .muted{color:var(--muted)}
-  .timer{
-    font-size:28px;
-    font-weight:700;
-    margin-top:16px;
-    text-align:center;
-  }
-  .timer.urgent{color:#ff7b7b;animation:pulse 1s infinite}
+  .timer{font-size:28px;font-weight:700;margin-top:16px}
+  .timer.urgent{color:#ff7b7b;animation: pulse 1s infinite}
   @keyframes pulse{0%{opacity:1}50%{opacity:.5}100%{opacity:1}}
-
   table{width:100%;border-collapse:collapse;color:var(--muted);font-size:14px}
   th,td{padding:8px;border-bottom:1px solid rgba(255,255,255,0.03);text-align:left}
   .correct{color:#86efac;font-weight:700}
   .wrong{color:#fb7185;font-weight:700}
   .small{font-size:13px;color:var(--muted)}
-
-  .topbar{
-    position:fixed;
-    left:0;right:0;top:0;
-    height:68px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:transparent;
-    pointer-events:none;
-    z-index:10;
-  }
-  .topbar img{
-    width:68px;
-    height:auto;
-    border-radius:12px;
-    box-shadow:0 0 14px rgba(79,70,229,0.4);
-    pointer-events:auto;
-    transition:transform .3s ease;
-  }
-  .topbar img:hover{transform:scale(1.05)}
-
+  .topbar{position:fixed;left:0;right:0;top:0;height:68px;display:flex;align-items:center;padding:0 28px;background:transparent;pointer-events:none}
+  .logo{pointer-events:auto}
+  .hidden{display:none}
   @media (max-width:800px){
-    .question-large{font-size:32px}
-    .options{grid-template-columns:repeat(2,1fr);gap:12px}
-  }
-  @media (max-width:600px){
-    .topbar img{width:60px;border-radius:10px}
-    .centered{padding:16px}
-    .question-large{font-size:28px}
+    .grid{grid-template-columns:repeat(2,160px)}
+    .options{grid-template-columns:repeat(2,1fr)}
   }
 </style>
 </head>
@@ -172,7 +50,7 @@
 <!-- Topbar / logo -->
 <div class="topbar">
   <div style="pointer-events:auto;">
-    <img src="LOGO.png" alt="" style="width:64px;height:auto;border-radius:12px;display:inline-block;margin-right:10px;vertical-align:middle;box-shadow:0 0 12px rgba(79,70,229,0.4);"/>
+    <img src="LOGO.png" alt="" style="width:48px;height:48px;border-radius:8px;display:inline-block;margin-right:10px;vertical-align:middle;background:linear-gradient(90deg,var(--purple-1),var(--purple-2));"/>
   </div>
 </div>
 
@@ -655,6 +533,3 @@ hide(resultsScreen);
 </script>
 </body>
 </html>
-
-
-
